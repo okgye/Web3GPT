@@ -33,7 +33,11 @@ export default function Home() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, prompt: userMessage }),
+        body: JSON.stringify({
+          address,
+          prompt: userMessage,
+          chatHistory, // Include chat history for context
+        }),
       });
 
       if (!response.ok) {
