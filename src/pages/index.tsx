@@ -57,17 +57,11 @@ export default function Home() {
   const handleEnterKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-
-      // 1. Set the scale state to true, so the button animates
       setAnimatePress(true);
-
-      // 2. Send the message
       sendMessage();
-
-      // 3. Revert the scale after a short delay
       setTimeout(() => {
         setAnimatePress(false);
-      }, 200); // adjust the delay as desired
+      }, 200);
     }
   };
 
@@ -79,8 +73,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      {/* Navbar with Glassmorphism */}
-      <nav className="z-50 relative w-full max-w-3xl flex items-center justify-between bg-white/20 backdrop-blur-lg shadow-md p-4 rounded-3xl border border-white/30">
+      <nav className="w-full max-w-3xl z-50 flex items-center justify-between p-4 bg-white/20 backdrop-blur-lg shadow-lg border border-white/30 md:relative md:top-auto md:left-auto md:rounded-3xl md:max-w-3xl fixed top-0 left-0 w-full rounded-none border-t">
         <h1 className="text-xl font-bold text-white">chETH</h1>
         <ConnectButton />
       </nav>
@@ -88,7 +81,6 @@ export default function Home() {
       <div className="absolute z-30 inset-0 bg-gradient-to-br from-blue-500 via-blue-400 to-indigo-500 animate-gradient"></div>
       
       {!isConnected && (
-        
         <div className="absolute inset-0 flex items-center justify-center z-70">
           <div className="absolute z-40 inset-0 bg-gradient-to-br from-blue-500 via-blue-400 to-indigo-500 animate-gradient"></div>
           <div className="relative z-50 max-w-md p-8 bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 text-center">
@@ -105,8 +97,6 @@ export default function Home() {
         </div>
       )}
 
-
-      {/* Chat UI with Glassmorphism */}
       <div ref={chatContainerRef} className="z-30 w-full max-w-3xl max-h-[75vh] overflow-y-auto m-4 bg-transparent">
         {chatHistory.map((msg, index) => (
           <div key={index} className={`p-4 my-2 rounded-3xl max-w-[80%] ${msg.sender === 'user' ? 'bg-blue-500/60 text-white self-end ml-auto' : 'bg-white/20 text-gray-900 mr-auto backdrop-blur-md border border-white/30'}`}>
@@ -115,8 +105,7 @@ export default function Home() {
         ))}
       </div>
 
-      {/* Message Input Box with Glassmorphism */}
-      <div className="z-30 w-full max-w-3xl flex items-center p-4 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30">
+      <div className="w-full max-w-3xl z-50 flex items-center p-4 bg-white/20 backdrop-blur-lg shadow-lg border border-white/30 md:relative md:bottom-auto md:left-auto md:rounded-3xl md:max-w-3xl fixed bottom-0 left-0 w-full rounded-none border-t">
         <textarea
           className="flex-1 p-3 text-white bg-transparent rounded-2xl outline-none resize-none overflow-hidden placeholder-white"
           placeholder="chETH에게 물어보세요..."
@@ -126,24 +115,14 @@ export default function Home() {
           rows={1}
         />
         
-        {/* 
-            The button has hover:scale-105 AND
-            conditionally "scale-105" if animatePress is true
-        */}
         <button
           onClick={sendMessage}
-          className={`
-            ml-3 px-4 py-2 bg-blue-500/80 text-white font-medium rounded-2xl shadow-md
-            transition-transform duration-150 cursor-pointer 
-            hover:scale-105
-            ${animatePress ? 'scale-105' : ''}
-          `}
+          className={`ml-3 px-4 py-2 bg-blue-500/80 text-white font-medium rounded-2xl shadow-md transition-transform duration-150 cursor-pointer hover:scale-105 ${animatePress ? 'scale-105' : ''}`}
         >
           Send
         </button>
       </div>
 
-      {/* Gradient Animation Styling */}
       <style jsx>{`
         @keyframes gradientAnimation {
           0% { background-position: 0% 50%; }
