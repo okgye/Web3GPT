@@ -7,6 +7,7 @@ import Head from 'next/head';
 export default function Home() {
   const { address, isConnected } = useAccount();
   const [message, setMessage] = useState('');
+  const [animatePress, setAnimatePress] = useState(false);
   const [chatHistory, setChatHistory] = useState<{ sender: 'user' | 'bot'; text: string }[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
@@ -50,6 +51,23 @@ export default function Home() {
     } catch (error) {
       console.error("Error fetching chat response:", error);
       setChatHistory((prev) => [...prev, { sender: 'bot', text: 'Error: Unable to process request' }]);
+    }
+  };
+
+  const handleEnterKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+
+      // 1. Set the scale state to true, so the button animates
+      setAnimatePress(true);
+
+      // 2. Send the message
+      sendMessage();
+
+      // 3. Revert the scale after a short delay
+      setTimeout(() => {
+        setAnimatePress(false);
+      }, 200); // adjust the delay as desired
     }
   };
 
@@ -104,15 +122,25 @@ export default function Home() {
           placeholder="chETH에게 물어보세요..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault();
-              sendMessage();
-            }
-          }}
+          onKeyDown={handleEnterKey}
           rows={1}
         />
-        <button onClick={sendMessage} className="ml-3 px-4 py-2 bg-blue-500/80 text-white font-medium rounded-2xl hover:bg-blue-600 transition-all shadow-md">Send</button>
+        
+        {/* 
+            The button has hover:scale-105 AND
+            conditionally "scale-105" if animatePress is true
+        */}
+        <button
+          onClick={sendMessage}
+          className={`
+            ml-3 px-4 py-2 bg-blue-500/80 text-white font-medium rounded-2xl shadow-md
+            transition-transform duration-150 cursor-pointer 
+            hover:scale-105
+            ${animatePress ? 'scale-105' : ''}
+          `}
+        >
+          Send
+        </button>
       </div>
 
       {/* Gradient Animation Styling */}
