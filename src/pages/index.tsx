@@ -66,7 +66,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-900 p-6 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-900 p-6 relative text-lg">
       <Head>
         <title>chETH</title>
         <meta name="description" content="Interact with ChatGPT securely via ETH Wallet authentication" />
