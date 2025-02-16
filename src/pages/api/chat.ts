@@ -2,7 +2,8 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 
 const WHITELIST = [
-  "0xDd3DEA716B95CC68b51f764bC25111C60De5D3F0".toLowerCase(), // ✅ Make sure your wallet is here
+  "0xDd3DEA716B95CC68b51f764bC25111C60De5D3F0".toLowerCase(),
+  "0xF3D8ED49c331B65Eca19cae99F7Dd090fE60BE22".toLowerCase() // ✅ Make sure your wallet is here
 ];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
