@@ -56,39 +56,40 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-900 p-6 relative">
       <Head>
-        <title>ChatGPT Mirror</title>
+        <title>chETH</title>
         <meta name="description" content="Interact with ChatGPT securely via ETH Wallet authentication" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
       {/* Navbar with Glassmorphism */}
-      <nav className="fixed top-0 left-0 w-full flex items-center justify-between bg-white/20 backdrop-blur-lg shadow-md p-4 rounded-b-xl border border-white/30">
-        <h1 className="text-xl font-bold text-white">HongGPT</h1>
+      <nav className="z-50 relative w-full max-w-3xl flex items-center justify-between bg-white/20 backdrop-blur-lg shadow-md p-4 rounded-3xl border border-white/30">
+        <h1 className="text-xl font-bold text-white">chETH</h1>
         <ConnectButton />
       </nav>
 
+      <div className="absolute z-30 inset-0 bg-gradient-to-br from-blue-500 via-blue-400 to-indigo-500 animate-gradient"></div>
+      
       {!isConnected && (
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          {/* Animated Gradient Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-400 to-indigo-500 animate-gradient"></div>
-
-          {/* Glassmorphism Modal */}
-          <div className="relative z-20 p-8 max-w-md bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 text-center">
+        
+        <div className="absolute inset-0 flex items-center justify-center z-70">
+          <div className="absolute z-40 inset-0 bg-gradient-to-br from-blue-500 via-blue-400 to-indigo-500 animate-gradient"></div>
+          <div className="relative z-50 max-w-md p-8 bg-white/20 backdrop-blur-lg rounded-3xl shadow-xl border border-white/30 text-center">
             <h2 className="text-3xl font-extrabold text-white mb-4">환영합니다!</h2>
             <p className="text-lg text-gray-200 leading-relaxed mb-6">
-              HongGPT는 <span className="font-semibold text-white">이더리움 월렛 인증</span>을 통해  
-              <br />실시간 AI 응답을 제공하는 채팅 서비스입니다.
+              chETH는 <span className="font-semibold text-white">이더리움 월렛 인증</span>을 통해  
+              <br />ChatGPT API를 제공하는 채팅 서비스입니다.
             </p>
             <div className="flex justify-center">
               <ConnectButton />
             </div>
-            <p className="text-sm text-gray-300 mt-4">* 먼저 월렛을 연결해 주세요.</p>
+            <p className="text-sm text-gray-500 mt-4">* 회원가입 문의: Telegram @okgye</p>
           </div>
         </div>
       )}
 
+
       {/* Chat UI with Glassmorphism */}
-      <div ref={chatContainerRef} className="w-full max-w-3xl h-[70vh] overflow-y-auto p-4 mt-8 bg-white/20 backdrop-blur-lg rounded-5xl shadow-lg border border-white/30">
+      <div ref={chatContainerRef} className="z-30 w-full max-w-3xl h-[70vh] overflow-y-auto p-4 m-4 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30">
         {chatHistory.map((msg, index) => (
           <div key={index} className={`p-3 my-2 rounded-lg max-w-[80%] ${msg.sender === 'user' ? 'bg-blue-500/70 text-white self-end ml-auto' : 'bg-white/30 text-gray-900 mr-auto backdrop-blur-md border border-white/40'}`}>
             {msg.text}
@@ -97,10 +98,10 @@ export default function Home() {
       </div>
 
       {/* Message Input Box with Glassmorphism */}
-      <div className="w-full max-w-3xl flex items-center p-4 mt-4 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30">
+      <div className="z-30 w-full max-w-3xl flex items-center p-4 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30">
         <textarea
-          className="flex-1 p-3 text-gray-900 bg-transparent rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none resize-none overflow-hidden placeholder-gray-300"
-          placeholder="ChatGPT에게 물어보세요..."
+          className="flex-1 p-3 text-gray-900 bg-transparent rounded-2xl outline-none resize-none overflow-hidden placeholder-white"
+          placeholder="chETH에게 물어보세요..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={(e) => {
