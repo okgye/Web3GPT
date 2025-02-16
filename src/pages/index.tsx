@@ -107,9 +107,9 @@ export default function Home() {
 
 
       {/* Chat UI with Glassmorphism */}
-      <div ref={chatContainerRef} className="z-30 w-full max-w-3xl h-[70vh] overflow-y-auto p-4 m-4 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30">
+      <div ref={chatContainerRef} className="z-30 w-full max-w-3xl max-h-[75vh] overflow-y-auto m-4 bg-transparent">
         {chatHistory.map((msg, index) => (
-          <div key={index} className={`p-3 my-2 rounded-lg max-w-[80%] ${msg.sender === 'user' ? 'bg-blue-500/70 text-white self-end ml-auto' : 'bg-white/30 text-gray-900 mr-auto backdrop-blur-md border border-white/40'}`}>
+          <div key={index} className={`p-4 my-2 rounded-3xl max-w-[80%] ${msg.sender === 'user' ? 'bg-blue-500/60 text-white self-end ml-auto' : 'bg-white/20 text-gray-900 mr-auto backdrop-blur-md border border-white/30'}`}>
             {msg.text}
           </div>
         ))}
@@ -118,7 +118,7 @@ export default function Home() {
       {/* Message Input Box with Glassmorphism */}
       <div className="z-30 w-full max-w-3xl flex items-center p-4 bg-white/20 backdrop-blur-lg rounded-3xl shadow-lg border border-white/30">
         <textarea
-          className="flex-1 p-3 text-gray-900 bg-transparent rounded-2xl outline-none resize-none overflow-hidden placeholder-white"
+          className="flex-1 p-3 text-white bg-transparent rounded-2xl outline-none resize-none overflow-hidden placeholder-white"
           placeholder="chETH에게 물어보세요..."
           value={message}
           onChange={(e) => setMessage(e.target.value)}
