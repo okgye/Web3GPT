@@ -5,7 +5,7 @@ const WHITELIST = [
   "0xDd3DEA716B95CC68b51f764bC25111C60De5D3F0".toLowerCase(),
   "0xF3D8ED49c331B65Eca19cae99F7Dd090fE60BE22".toLowerCase(),
   "0x125a8f35ae11BA5ea94cAa70B404E1d1F785Ae45".toLowerCase(),
-  "0x74b39CA2bA2CC7E96B11FDE24eb2B4B5F2F3C307".toLowerCase() // ✅ Make sure your wallet is here
+  "0xE8e87d195451688384543AB10a7B3d6465136b2C".toLowerCase()
 ];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
