@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
 import Head from 'next/head';
+import ToggleModel from "@components/ToggleModel";
 
 export default function Home() {
   const { address, isConnected } = useAccount();
