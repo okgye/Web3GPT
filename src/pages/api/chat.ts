@@ -32,7 +32,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-4o", // ✅ Updated model
+        model: "gpt-4o-latest", // ✅ Updated model
         messages: [{ role: "user", content: prompt }],
         temperature: 0.7
       },
