@@ -12,6 +12,12 @@ export default function Home() {
   const [chatHistory, setChatHistory] = useState<{ sender: 'user' | 'bot'; text: string }[]>([]);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
+  const [model, setModel] = useState("chatgpt-4o-latest");
+
+  const handleToggleModel = (newModel: string) => {
+    setModel(newModel);
+    console.log("API request sent with model:", newModel);
+  };
 
   useEffect(() => setMounted(true), []);
 
@@ -23,26 +29,31 @@ export default function Home() {
 
   if (!mounted) return null;
 
-  const sendMessage = async () => {
+  const sendMessage = async (model: string) => {
     if (!message.trim() || !address) return;
-
+  
     const userMessage = message;
     setMessage('');
     setChatHistory((prev) => [...prev, { sender: 'user', text: userMessage }]);
-
+  
+    // Debugging logs
+    console.log("Address:", address);
+    console.log("User Message:", userMessage);
+    console.log("Model:", model);
+  
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, prompt: userMessage }),
+        body: JSON.stringify({ address, prompt: userMessage, model }), // Pass simple variables only
       });
-
+  
       if (!response.ok) {
         throw new Error(`Server responded with ${response.status}`);
       }
-
+  
       const data = await response.json();
-
+  
       if (data.choices && data.choices.length > 0) {
         const botMessage = data.choices[0].message.content;
         setChatHistory((prev) => [...prev, { sender: 'bot', text: botMessage }]);
@@ -54,12 +65,13 @@ export default function Home() {
       setChatHistory((prev) => [...prev, { sender: 'bot', text: 'Error: Unable to process request' }]);
     }
   };
-
+  
+  
   const handleEnterKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       setAnimatePress(true);
-      sendMessage();
+      sendMessage(model);
       setTimeout(() => {
         setAnimatePress(false);
       }, 200);
@@ -75,7 +87,7 @@ export default function Home() {
       </Head>
 
       <nav className="w-full max-w-3xl z-50 flex items-center justify-between p-4 bg-white/20 backdrop-blur-lg shadow-lg border border-white/30 md:relative md:top-auto md:left-auto md:rounded-3xl md:max-w-3xl fixed top-0 left-0 w-full rounded-none border-t">
-        <h1 className="text-xl font-bold text-white">chETH</h1>
+        <ToggleModel initialModel={model} onToggle={handleToggleModel} />
         <ConnectButton />
       </nav>
 
@@ -117,11 +129,15 @@ export default function Home() {
         />
         
         <button
-          onClick={sendMessage}
+          onClick={(e) => {
+            e.preventDefault();  // Prevent the default behavior (e.g., form submission or reload)
+            sendMessage(model);  // Pass the model explicitly
+          }}
           className={`ml-3 px-4 py-2 bg-blue-500/80 text-white font-medium rounded-2xl shadow-md transition-transform duration-150 cursor-pointer hover:scale-105 ${animatePress ? 'scale-105' : ''}`}
         >
           Send
         </button>
+
       </div>
 
       <style jsx>{`

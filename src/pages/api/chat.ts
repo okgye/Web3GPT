@@ -14,9 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
 
-  const { address, prompt } = req.body;
+  const { address, prompt, model } = req.body;
 
-  console.log("Received request:", { address, prompt });
+  console.log("Received request with model:", model);
 
   if (!address || !WHITELIST.includes(address.toLowerCase())) {
     console.error("Unauthorized address:", address);
@@ -32,19 +32,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const response = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-4o", // ✅ Updated model
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7
+        model: model,
+        messages: [
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: prompt }
+        ],
+        store: true
       },
-      { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" } }
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json"
+        }
+      }
     );
 
     console.log("ChatGPT response:", JSON.stringify(response.data, null, 2));
     res.status(200).json(response.data);
   } catch (error: any) {
     console.error("OpenAI API Error:", error.response?.data || error.message);
-
-    // Send detailed error response
     res.status(500).json({ error: "ChatGPT API error", details: error.response?.data || error.message });
   }
 }
