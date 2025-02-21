@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import OpenAI from 'openai';
 import axios from 'axios';
 
+const client = new OpenAI();
 const WHITELIST = [
   "0xDd3DEA716B95CC68b51f764bC25111C60De5D3F0".toLowerCase(),
   "0xF3D8ED49c331B65Eca19cae99F7Dd090fE60BE22".toLowerCase(),
@@ -10,41 +12,43 @@ const WHITELIST = [
 ];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
-  }
-
-  const { address, prompt } = req.body;
-
-  console.log("Received request:", { address, prompt });
-
-  if (!address || !WHITELIST.includes(address.toLowerCase())) {
-    console.error("Unauthorized address:", address);
-    return res.status(403).json({ error: "Unauthorized wallet" });
-  }
-
   if (!process.env.OPENAI_API_KEY) {
     console.error("Missing OpenAI API Key");
     return res.status(500).json({ error: "Server misconfiguration: Missing API key" });
   }
 
-  try {
-    const response = await axios.post(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        model: "chatgpt-4o-latest", // ✅ Updated model
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.7
-      },
-      { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, "Content-Type": "application/json" } }
-    );
-
-    console.log("ChatGPT response:", JSON.stringify(response.data, null, 2));
-    res.status(200).json(response.data);
-  } catch (error: any) {
-    console.error("OpenAI API Error:", error.response?.data || error.message);
-
-    // Send detailed error response
-    res.status(500).json({ error: "ChatGPT API error", details: error.response?.data || error.message });
+  if (req.method !== 'GET') {
+    return res.status(405).json({ error: 'Method Not Allowed' });
   }
+
+  const { address, prompt } = req.query;
+
+  if (!address || typeof address !== 'string' || !WHITELIST.includes(address.toLowerCase())) {
+    console.error("Unauthorized address:", address);
+    return res.status(403).json({ error: "Unauthorized wallet" });
+  }
+
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: "Missing or invalid prompt" });
+  }
+
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache, no-transform',
+    'Connection': 'keep-alive',
+  });
+
+  const stream = await client.chat.completions.create({
+    model: 'chatgpt-4o-latest',
+    messages: [{ role: 'user', content: prompt }],
+    stream: true,
+  });
+
+for await (const chunk of stream) {
+  // Extract the new content from the chunk.
+  const content = chunk.choices[0]?.delta?.content || '';
+  // Write the content to the HTTP response in SSE format.
+  res.write(`data: ${content}\n\n`);
+}
+res.end();
 }

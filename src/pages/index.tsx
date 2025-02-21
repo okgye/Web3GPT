@@ -22,36 +22,71 @@ export default function Home() {
 
   if (!mounted) return null;
 
-  const sendMessage = async () => {
+  type ChatMessage = {
+    sender: "user" | "bot";
+    text: string;
+  };
+
+  const sendMessage = () => {
     if (!message.trim() || !address) return;
-
+  
+    // Add the user's message to the chat history.
     const userMessage = message;
+    setChatHistory((prev: ChatMessage[]) => [...prev, { sender: 'user', text: userMessage }]);
     setMessage('');
-    setChatHistory((prev) => [...prev, { sender: 'user', text: userMessage }]);
-
-    try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address, prompt: userMessage }),
+  
+    // Build the URL with query parameters (EventSource only supports GET)
+    const url = new URL('/api/chat', window.location.origin);
+    url.searchParams.append('address', address);
+    url.searchParams.append('prompt', userMessage);
+  
+    // Use a ref to track if the stream ended normally.
+    const streamFinished = { current: false };
+  
+    // Create an EventSource connection to your API endpoint.
+    const eventSource = new EventSource(url.toString());
+  
+    eventSource.onmessage = (event) => {
+      // Check for a termination signal (you can define "[DONE]" or any other indicator).
+      if (event.data === "[DONE]") {
+        streamFinished.current = true;
+        console.log("Stream finished normally.");
+        eventSource.close();
+        return;
+      }
+      // If the last message is from the bot, append new content; otherwise, add a new bot message.
+      setChatHistory((prev: ChatMessage[]) => {
+        const last = prev[prev.length - 1];
+        if (last && last.sender === "bot") {
+          return [
+            ...prev.slice(0, -1),
+            { sender: "bot", text: last.text + event.data }
+          ];
+        } else {
+          return [
+            ...prev,
+            { sender: "bot", text: event.data }
+          ];
+        }
       });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data.choices && data.choices.length > 0) {
-        const botMessage = data.choices[0].message.content;
-        setChatHistory((prev) => [...prev, { sender: 'bot', text: botMessage }]);
+    };
+  
+    eventSource.onerror = (error) => {
+      // Only display an error if the stream did not finish normally.
+      if (streamFinished.current || eventSource.readyState === EventSource.CLOSED) {
+        console.log("EventSource connection closed normally.");
       } else {
-        setChatHistory((prev) => [...prev, { sender: 'bot', text: 'Error: No valid response from AI' }]);
+        console.error("EventSource error:", error);
+        setChatHistory((prev: ChatMessage[]) => [
+          ...prev,
+        ]);
       }
-    } catch (error) {
-      console.error("Error fetching chat response:", error);
-      setChatHistory((prev) => [...prev, { sender: 'bot', text: 'Error: Unable to process request' }]);
-    }
+      eventSource.close();
+    };
+  
+    eventSource.onopen = () => {
+      console.log("EventSource connection opened.");
+    };
   };
 
   const handleEnterKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -66,7 +101,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-900 p-6 relative text-lg">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-gray-900 p-2 relative text-lg">
       <Head>
         <title>chETH</title>
         <meta name="description" content="Interact with ChatGPT securely via ETH Wallet authentication" />
@@ -97,7 +132,7 @@ export default function Home() {
         </div>
       )}
 
-      <div ref={chatContainerRef} className="z-30 w-full max-w-3xl max-h-[75vh] overflow-y-auto m-4 bg-transparent">
+      <div ref={chatContainerRef} className="z-30 w-full max-w-3xl max-h-[80vh] overflow-y-auto m-1 bg-transparent">
         {chatHistory.map((msg, index) => (
           <div key={index} className={`p-4 my-2 rounded-3xl max-w-[80%] ${msg.sender === 'user' ? 'bg-blue-500/60 text-white self-end ml-auto' : 'bg-white/20 text-gray-900 mr-auto backdrop-blur-md border border-white/30'}`}>
             {msg.text}
